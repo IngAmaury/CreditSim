@@ -1,27 +1,51 @@
 export async function simulateLoan({ amount, rate, months }) {
   const cleanAmount = String(amount).replace(/,/g, "");
-  const res = await fetch("/api/simulate", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      amount: Number(cleanAmount),
-      rate: Number(rate),
-      months: Number(months),
-    }),
-  });
+  try {
+    const res = await fetch("/api/simulate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        amount: Number(String(amount).replace(/,/g, "")),
+        rate: Number(rate),
+        months: Number(months),
+      }),
+    });
 
-  const json = await res.json().catch(() => null);
+    // Intentar leer JSON si existe
+    let json = null;
+    const contentType = res.headers.get("content-type") || "";
+    if (contentType.includes("application/json")) {
+      json = await res.json();
+    }
 
-  if (!res.ok) {
-    const message =
-      json?.detail ||
-      json?.message ||
-      "Request failed. Please check your inputs and try again.";
-    throw new Error(message);
+    if (!res.ok) {
+      const detail =
+        json?.detail ||
+        json?.message ||
+        "La solicitud fue rechazada por el servidor.";
+
+      // Lanza un error con status para mostrarlo arriba
+      const err = new Error(`Error ${res.status}: ${detail}`);
+      err.status = res.status;
+      err.detail = detail;
+      throw err;
+    }
+
+    return json?.data ?? json;
+  } catch (err) {
+    // Error de red (backend apagado, sin internet, CORS, etc.)
+    // fetch en ese caso NO tiene status.
+    const isNetworkError = err instanceof TypeError && !("status" in err);
+
+    if (isNetworkError) {
+      throw new Error(
+        "No se pudo conectar con el servidor. Verifica que el backend esté encendido o tu conexión a internet."
+      );
+    }
+
+    // Si ya venía con status, lo dejamos
+    throw err;
   }
-
-  // Expect: { ok: true, data: ... }
-  return json?.data ?? json;
 }
 
 /**

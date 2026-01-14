@@ -95,13 +95,13 @@ export default function App() {
       const normalized = normalizeSimulationResponse(data);
 
       if (!normalized?.schedule?.length) {
-        throw new Error("Backend returned an empty schedule.");
+        throw new Error("El backend devolvió una tabla vacía.");
       }
 
       setResult(normalized);
     } catch (err) {
       setResult(null);
-      setError(err?.message || "Something went wrong.");
+      setError(err?.message || "Algo salió mal. 😞");
     } finally {
       setLoading(false);
     }
@@ -154,7 +154,11 @@ export default function App() {
               />
             </Stack>
 
-            <Stack direction="row" spacing={2} sx={{ mt: 2 }} alignItems="center">
+            <Typography variant="body2" color="text.secondary">
+              Tip: Cambiar el monto del crédito borra la tabla calculada.
+            </Typography>
+            
+            <Stack direction="row" spacing={2} sx={{ mt: 1 }} alignItems="center">
               <Button
                 type="submit"
                 variant="contained"
@@ -171,9 +175,6 @@ export default function App() {
                 )}
               </Button>
 
-              <Typography variant="body2" color="text.secondary">
-                Tip: Cambiar el monto del crédito borra la tabla calculada.
-              </Typography>
             </Stack>
           </Box>
 
