@@ -13,7 +13,7 @@ def simulate(payload: SimulateRequest):
             term_months=payload.months,
         )
         return {"ok": True, "data": {
-            "montly_payment": mp,
+            "monthly_payment": mp,
             "total_paid": tp,
             "total_interest": ti,
             "schedule": schedule
