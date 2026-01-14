@@ -38,6 +38,7 @@ async def simulate(payload: SimulateRequest, db: Session = Depends(get_db),):
         db.refresh(sim)
 
         asyncio.create_task(risk_audit(sim.id, payload.amount, payload.rate, payload.months))
+        
         return {"ok": True, 
                 "simulation_id": sim.id,
                 "audit_status": "PENDING",
