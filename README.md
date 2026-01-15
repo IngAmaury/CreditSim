@@ -151,3 +151,7 @@ After each simulation:
 - It runs asynchronously (background) and does not block the /simulate response.
 - It takes 1–3 seconds.
 - It fails ~10% of the time (simulated).
+
+## License 📜
+This project is licensed under the MIT License.
+See the LICENSE file for details.
