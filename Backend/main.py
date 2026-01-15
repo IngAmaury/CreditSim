@@ -51,3 +51,14 @@ async def simulate(payload: SimulateRequest, db: Session = Depends(get_db),):
 
     except ValueError as e:
         raise HTTPException(status_code=422, detail=str(e))
+    
+@app.get("/simulations/{simulation_id}")
+def get_simulation(simulation_id: int, db: Session = Depends(get_db)):
+    sim = db.get(Simulation, simulation_id)
+    if not sim:
+        raise HTTPException(status_code=404, detail="Simulation not found")
+
+    return {
+        "id": sim.id,
+        "audit_status": sim.audit_status,
+    }
