@@ -45,3 +45,6 @@ dist-ssr
 *.sqlite
 *.sqlite3
 creditsim.db
+
+#AWS 
+*.pem
