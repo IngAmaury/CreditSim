@@ -11,7 +11,6 @@ export async function simulateLoan({ amount, rate, months }) {
       }),
     });
 
-    // Intentar leer JSON si existe
     let json = null;
     const contentType = res.headers.get("content-type") || "";
     if (contentType.includes("application/json")) {
@@ -31,7 +30,7 @@ export async function simulateLoan({ amount, rate, months }) {
       throw err;
     }
 
-    return json?.data ?? json;
+    return json;
   } catch (err) {
     // Error de red (backend apagado, sin internet, CORS, etc.)
     // fetch en ese caso NO tiene status.
@@ -66,4 +65,17 @@ export function normalizeSimulationResponse(data) {
     total_interest: data?.total_interest,
     schedule: data?.schedule,
   };
+}
+
+//Aditional auditory notification
+
+export async function getAuditStatus(simulationId) {
+  const res = await fetch(`/api/simulations/${simulationId}`);
+  const json = await res.json().catch(() => null);
+
+  if (!res.ok) {
+    const detail = json?.detail || "Error al consultar auditoría";
+    throw new Error(`HTTP ${res.status}: ${detail}`);
+  }
+  return json; // { id, audit_status, audit_error }
 }

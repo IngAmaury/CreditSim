@@ -1,3 +1,4 @@
+import { auditToast } from "./utils/auditToast";
 import * as React from "react";
 import {
   Alert,
@@ -13,7 +14,7 @@ import {
   Divider,
 } from "@mui/material";
 import AmortizationTable from "./AmortizationTable.jsx";
-import { simulateLoan, normalizeSimulationResponse } from "./api.js";
+import { simulateLoan, normalizeSimulationResponse, getAuditStatus } from "./api.js";
 import { formatMoney } from "./AmortizationTable.jsx";
 import { onlyDigits, formatThousandsMX, onlyDigitsAndDot, clampNumberString } from "./utils/formatForm.js";
 
@@ -86,17 +87,15 @@ export default function App() {
     setError("");
 
     try {
-      const data = await simulateLoan({
-        amount: form.amount,
-        rate: form.rate,
-        months: form.months,
-      });
+      const res = await simulateLoan({ amount: form.amount, rate: form.rate, months: form.months });
 
-      const normalized = normalizeSimulationResponse(data);
+      const normalized = normalizeSimulationResponse(res.data);
 
       if (!normalized?.schedule?.length) {
         throw new Error("El backend devolvió una tabla vacía.");
       }
+
+      auditToast(res.simulation_id, form.amount, getAuditStatus);
 
       setResult(normalized);
     } catch (err) {
