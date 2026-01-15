@@ -153,5 +153,5 @@ After each simulation:
 - It fails ~10% of the time (simulated).
 
 ## License 📜
-This project is licensed under the MIT License.
+This project is licensed under the MIT License (2026).
 See the LICENSE file for details.
