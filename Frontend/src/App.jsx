@@ -68,6 +68,11 @@ export default function App() {
     // Keep at most 2 decimals (opcional)
     const [i, d] = raw.split(".");
     const normalized = d !== undefined ? `${i}.${d.slice(0, 2)}` : i;
+    
+    if (normalized.endsWith(".")) {
+      setForm((prev) => ({ ...prev, rate: normalized }));
+      return;
+    }
 
     // Clamp 0..100 (solo cuando ya es número válido)
     const clamped = clampNumberString(normalized, 0, 100);
@@ -77,7 +82,8 @@ export default function App() {
 
   const handleMonthsChange = (e) => {
     const raw = onlyDigits(e.target.value); // only integers
-    setForm((prev) => ({ ...prev, months: raw }));
+    const clamped = clampNumberString(raw, 1, 600);
+    setForm((prev) => ({ ...prev, months: clamped }));
   };
 
 
