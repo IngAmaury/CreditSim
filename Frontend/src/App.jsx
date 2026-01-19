@@ -17,6 +17,7 @@ import AmortizationTable from "./AmortizationTable.jsx";
 import { simulateLoan, normalizeSimulationResponse, getAuditStatus } from "./api.js";
 import { formatMoney } from "./AmortizationTable.jsx";
 import { onlyDigits, formatThousandsMX, onlyDigitsAndDot, clampNumberString } from "./utils/formatForm.js";
+import { validateForm } from "./utils/validation.js";
 
 const STORAGE_KEY = "creditsim.form.inputs";
 
@@ -40,6 +41,7 @@ export default function App() {
   const [form, setForm] = React.useState(loadFormDefaults);
   const [result, setResult] = React.useState(null);
   const [loading, setLoading] = React.useState(false);
+  const [warning, setWarning] = React.useState("");
   const [error, setError] = React.useState("");
 
   // Persist form in localStorage
@@ -88,11 +90,19 @@ export default function App() {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    setLoading(true);
+    setWarning("");
     setError("");
-
+    
+    const v = validateForm(form);
+    if (!v.ok) {
+      setResult(null);
+      setWarning(v.msg);
+      return;
+    }
+    
+    setLoading(true);
     try {
-      const res = await simulateLoan({ amount: form.amount, rate: form.rate, months: form.months });
+      const res = await simulateLoan({ amount: v.values.amount, rate: v.values.rate, months: v.values.months });
 
       const normalized = normalizeSimulationResponse(res.data);
 
@@ -181,6 +191,12 @@ export default function App() {
 
             </Stack>
           </Box>
+
+          {warning && (
+            <Alert severity="warning" sx={{ mt: 2 }}>
+              {warning}
+            </Alert>
+          )}
 
           {error && (
             <Alert severity="error" sx={{ mt: 2 }}>
