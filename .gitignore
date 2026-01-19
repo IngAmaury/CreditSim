@@ -49,3 +49,4 @@ creditsim.db
 #AWS 
 *.pem
 aws.txt
+*.pdf
