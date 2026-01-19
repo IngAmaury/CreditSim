@@ -1,3 +1,22 @@
+function toDetailString(detail) {
+  if (!detail) return "Error desconocido";
+
+  if (typeof detail === "string") return detail;
+
+  // FastAPI/Pydantic suele mandar: [{loc, msg, type}, ...]
+  if (Array.isArray(detail)) {
+    const first = detail[0];
+    if (first?.msg) return first.msg;
+    return JSON.stringify(detail);
+  }
+
+  if (typeof detail === "object") {
+    return detail.message || JSON.stringify(detail);
+  }
+
+  return String(detail);
+}
+
 export async function simulateLoan({ amount, rate, months }) {
   const cleanAmount = String(amount).replace(/,/g, "");
   try {
@@ -18,16 +37,8 @@ export async function simulateLoan({ amount, rate, months }) {
     }
 
     if (!res.ok) {
-      const detail =
-        json?.detail ||
-        json?.message ||
-        "La solicitud fue rechazada por el servidor.";
-
-      // Lanza un error con status para mostrarlo arriba
-      const err = new Error(`Error ${res.status}: ${detail}`);
-      err.status = res.status;
-      err.detail = detail;
-      throw err;
+      const detail = toDetailString(json?.detail || json?.message);
+      throw new Error(`Error ${res.status}: ${detail}`);
     }
 
     return json;
