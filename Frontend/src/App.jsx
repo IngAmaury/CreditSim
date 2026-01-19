@@ -51,9 +51,8 @@ export default function App() {
     // Allow digits + optional dot, and format with commas
     const raw = onlyDigitsAndDot(e.target.value);
 
-    // Avoid more than one dot
-    const parts = raw.split(".");
-    const normalized = parts.length > 2 ? `${parts[0]}.${parts.slice(1).join("")}` : raw;
+    const [i, d] = raw.split(".");
+    const normalized = d !== undefined ? `${i}.${d.slice(0, 2)}` : i;
 
     setForm((prev) => ({ ...prev, amount: formatThousandsMX(normalized) }));
 
